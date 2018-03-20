@@ -31,7 +31,7 @@ function call_weditor(){
 
 if [[ -z $WEDI_RC ]]; then #is not set, then error
 echo "WEDI_RC not set."
-return 1
+exit 1
 elif [[ ! -f $WEDI_RC ]]; then #test if file not exists (but is set), then create path+file 
 mkdir -p "$(dirname "$WEDI_RC")" && touch "$WEDI_RC"
 fi
@@ -42,7 +42,7 @@ if [[ -f $1 ]]; then #if is file
 	call_weditor "$(realpath "$wfile")"
 	else
 	echo "File not exists."
-	return 1
+	exit 1
 	fi	
 
 elif [[ -d $1 ]] || [[ -z $1 ]]; then #if is DIR or if is empty (DIR be set as PWD)
