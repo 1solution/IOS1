@@ -1,9 +1,6 @@
 #!/bin/bash
 POSIXLY_CORRECT=yes
 
-
-#FUNCTIONS
-
 #check if dir is set as argument and if exists
 function dir_exists(){
 	if [[ -n $dr ]] && [[ -d $dr ]]; then
@@ -12,7 +9,6 @@ function dir_exists(){
 	return 1
 	fi
 }
-
 #check if file exists in realpath
 function check_file(){
 	if [[ -f $(realpath "$wfile") ]]; then
@@ -21,7 +17,6 @@ function check_file(){
 	return 1
 	fi
 }
-
 function call_weditor(){
 	"${EDITOR:-${VISUAL:-vi}}" "$wfile"
 	now="$(date +'%Y/%m/%d')"
@@ -33,8 +28,6 @@ function call_weditor(){
 	fi	
 	return 0 ##### ?????
 }
-
-
 
 if [[ -z $WEDI_RC ]]; then #is not set, then error
 echo "WEDI_RC not set."
