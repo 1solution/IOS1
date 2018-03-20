@@ -22,7 +22,7 @@ function call_weditor(){
 	now="$(date +'%Y/%m/%d')"
 	res="$(awk 'BEGIN -F "\t" -v file="$wfile" -v w=$WEDI_RC /$file/ {if($1 !~ "$file"){print "1"}; else {print "0"}}' "$w")"
 	if [[ $res -eq 0 ]]; then #is in the file
-	awk 'BEGIN -F "\t" -v new=$now -v file="$wfile" -v w=$WEDI_RC /$file/ $2++; $3=$now' "$w"
+	awk 'BEGIN -F "\t" -v new=$now -v file="$wfile" -v w=$WEDI_RC /$file/ {$2++; $3=$now}' "$w"
 	else
 	printf "%s\t1\t%s\n" "$wfile" "$now" >> $WEDI_RC
 	fi	
@@ -40,7 +40,6 @@ if [[ -f $1 ]]; then #if is file
 	wfile=$1
 	if [[ $(check_file "$wfile") -eq 0 ]]; then
 	call_weditor "$(realpath "$wfile")"
-	#####->DO WEDI_RC PRIDEJ ZAZNAM A DAL EDITUJ.
 	else
 	echo "File not exists."
 	return 1
