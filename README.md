@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 POSIXLY_CORRECT=yes
 
 #check if dir is set as argument and if exists
