@@ -19,15 +19,15 @@ function check_file(){
 }
 function call_weditor(){
 	"${EDITOR:-${VISUAL:-vi}}" "$wfile"
-	#now="$(date +'%Y/%m/%d')"
-	#res="$(awk 'BEGIN -F "\t" -v file="$wfile" -v w=$WEDI_RC /$file/ {if($1 !~ "$file"){print "1"}; else {print "0"}}' "$w")"
+	#now="$(date +'%Y-%m-%d')"
+	#res="$(awk 'BEGIN -F "\t" -v file="$wfile" -v w=$WEDI_RC /$file/ {if($1 !~ "$file"){print "1"}; else {print "0"}}' "$w")" ## BAD
 	if [[ $res -eq 0 ]]; then #is in the file
-	#awk 'BEGIN -F "\t" -v new=$now -v file="$wfile" -v w=$WEDI_RC /$file/ {$2++; $3=$now}' "$w"
+	#awk 'BEGIN -F "\t" -v new=$now -v file="$wfile" -v w=$WEDI_RC /$file/ {$2++; $3=$now}' "$w" ## BAD
 	echo "call weditor awk wall"
 	else
 	printf "%s\t1\t%s\n" "$wfile" "$now" >> $WEDI_RC
 	fi	
-	return 0 ##### ?????
+	return 0
 }
 
 if [[ -z $WEDI_RC ]]; then #is not set, then error
@@ -74,7 +74,7 @@ case "$1" in
 	else
 	def_dir=$PWD
 	fi
-	#wfile="$(awk 'BEGIN -F "\t" -v max=0 -v dir="$def_dir" -v w="$WEDI_RC" /$def_dir/ {if($2>max){final=$1; max=$2}} END{print final}' "$w")"
+	wfile="$(awk -v max=0 -v dir="$def_dir" 'BEGIN{-F "\t"} $1 ~ dir {if($2>max) {max=$2; rcd=$1}} END{print rcd}' "$WEDI_RC")" ## SHOULD BE O.K.
 	#call_weditor "$wfile"
 	;;
 
@@ -85,7 +85,7 @@ case "$1" in
 	else
 	def_dir=$PWD
 	fi
-	#awk 'BEGIN -F "\t" -v dir="$def_dir" -v w="$WEDI_RC" /$def_dir/ {print $0}' "$w"
+	awk -v dir="$def_dir" 'BEGIN{-F "\t"} $1 ~ dir {print $1}' "$WEDI_RC" ## SHOULD BE O.K.
 	return 0
 	;;
 
@@ -96,8 +96,8 @@ case "$1" in
 	else
 	def_dir=$PWD
 	fi
-	tim=$2
-	#awk 'BEGIN -F "\t" -v t="$tim" -v dir="$def_dir" -v w=$WEDI_RC /$def_dir/ {if(t>=$3) {print}}' "$w"
+	time=$2
+	awk -v dir="$def_dir" -v time="$time" 'BEGIN{-F "\t"} $1 ~ dir {if(time>$3) {print $1}}' "$WEDI_RC" ## SHOULD BE O.K.
 	return 0	
 	;;
 
@@ -108,8 +108,8 @@ case "$1" in
 	else
 	def_dir=$PWD
 	fi
-	tim=$2
-	#awk 'BEGIN -F "\t" -v t="$tim" -v dir="$def_dir" -v w=$WEDI_RC /$def_dir/ {if(t<=$3) {print}}' "$w"	
+	time=$2
+	awk -v dir="$def_dir" -v time="$time" 'BEGIN{-F "\t"} $1 ~ dir {if(time<$3) {print $1}}' "$WEDI_RC"  ## SHOULD BE O.K.	
 	return 0
 	;;
 
