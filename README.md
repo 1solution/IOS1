@@ -15,12 +15,11 @@ function call_weditor(){
 	now="$(date +'%Y-%m-%d')"
 	if grep -q "$wfile" "$WEDI_RC"; then
 	#####->SED EDIT LINE
-	echo ""
+	:
 	else
 	printf "%s\t1\t%s\n" "$wfile" "$now" >> $WEDI_RC
 	fi
-	#"${EDITOR:-${VISUAL:-vi}}" "$wfile"
-	echo "Opening file $wfile in wrapper"
+	"${EDITOR:-${VISUAL:-vi}}" "$wfile"
 	return 0
 }
 
@@ -31,30 +30,7 @@ elif [[ ! -f $WEDI_RC ]]; then #test if file not exists (but is set), then creat
 mkdir -p "$(dirname "$WEDI_RC")" && touch "$WEDI_RC"
 fi
 
-if [[ -f $1 ]]; then #if is file
-	wfile="$(realpath "$1")"
-	if [[ -f $wfile ]]; then
-	echo "proslo validaci na soubor"
-	call_weditor "$wfile"
-	else
-	echo "File not exists."
-	exit 1
-	fi	
-
-elif [[ -d $1 ]] || [[ -z $1 ]]; then #if is DIR	
-		if [[ -d $1 ]]; then
-		dr=$1
-		else
-		dr=$PWD
-		fi	
-		if [[ $(dir_exists "$dr") -eq 0 ]]; then
-		def_dir=$(realpath "$dr")
-		else
-		def_dir=$PWD
-		fi
-	wfile="$(awk -v dir="$def_dir" -v now="1955-05-05" 'BEGIN{-F "\t"} $1 ~ dir {if($3>now){now=$3;rcd=$1}} END{print rcd}' "$WEDI_RC")"
-	call_weditor "$wfile"
-fi
+if [[ $1 == -b || $1 == -l || $1 == -a || $1 == -m ]]; then
 
 case "$1" in
 	-m)
@@ -114,3 +90,27 @@ case "$1" in
 	;;
 
 esac
+
+
+elif [[ -f $(realpath $1) ]]; then #if is file
+	wfile="$(realpath "$1")"
+	call_weditor "$wfile"	
+
+elif [[ -d $1 ]] || [[ -z $1 ]]; then #if is DIR	
+		if [[ -d $1 ]]; then
+		dr=$1
+		else
+		dr=$PWD
+		fi	
+		if [[ $(dir_exists "$dr") -eq 0 ]]; then
+		def_dir=$(realpath "$dr")
+		else
+		def_dir=$PWD
+		fi
+	wfile="$(awk -v dir="$def_dir" -v now="1955-05-05" 'BEGIN{-F "\t"} $1 ~ dir {if($3>now){now=$3;rcd=$1}} END{print rcd}' "$WEDI_RC")"
+	call_weditor "$wfile"
+
+else
+	echo "Not a file."
+	exit 1
+fi
