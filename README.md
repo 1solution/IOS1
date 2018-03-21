@@ -11,7 +11,7 @@ function dir_exists(){
 }
 function call_weditor(){
 	now="$(date +'%Y-%m-%d')"
-	if grep -q "$wfile" $WEDI_RC; then
+	if grep -q "$wfile" "$WEDI_RC"; then
 	#####->SED EDIT LINE
 	echo ""
 	else
@@ -73,7 +73,7 @@ case "$1" in
 	else
 	def_dir=$PWD
 	fi
-	awk -v dir="$def_dir" 'BEGIN{-F "\t"} $1 ~ dir {print $1}' "$WEDI_RC"
+	awk -v dir="$def_dir" 'BEGIN{-F" +|/"} $1 ~ dir {n=split($1,a,"/"); print a[n]}' "$WEDI_RC"
 	exit 0
 	;;
 
@@ -85,7 +85,7 @@ case "$1" in
 	def_dir=$PWD
 	fi
 	time=$2
-	awk -v dir="$def_dir" -v time="$time" 'BEGIN{-F "\t"} $1 ~ dir {if(time>=$3) {print $1}}' "$WEDI_RC"
+	awk -v dir="$def_dir" -v time="$time" 'BEGIN{-F "\t"} $1 ~ dir {if(time>=$3) {n=split($1,a,"/"); print a[n]}}' "$WEDI_RC"
 	exit 0
 	;;
 
@@ -97,7 +97,7 @@ case "$1" in
 	def_dir=$PWD
 	fi
 	time=$2
-	awk -v dir="$def_dir" -v time="$time" 'BEGIN{-F "\t"} $1 ~ dir {if(time<=$3) {print $1}}' "$WEDI_RC"	
+	awk -v dir="$def_dir" -v time="$time" 'BEGIN{-F "\t"} $1 ~ dir {if(time<=$3) {n=split($1,a,"/"); print a[n]}}' "$WEDI_RC"	
 	exit 0
 	;;
 
