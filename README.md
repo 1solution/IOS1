@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 POSIXLY_CORRECT=yes
 
+##rozjet: sed,- if file not exists from start, if file is in WEDI_RC but not exists -> delete. chyby z editoru predavat
+
 #check if dir is set as argument and if exists
 function dir_exists(){
 	if [[ -n $dr ]] && [[ -d $dr ]]; then
@@ -85,8 +87,13 @@ case "$1" in
 	def_dir=$PWD
 	fi
 	time=$2
+	if [[ $time =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
 	awk -v dir="$def_dir" -v time="$time" 'BEGIN{-F "\t"} $1 ~ dir {if(time>=$3) {n=split($1,a,"/"); print a[n]}}' "$WEDI_RC"
 	exit 0
+	else
+	echo "Incorrect date format."
+	exit 1
+	fi
 	;;
 
 	-a)
@@ -97,8 +104,13 @@ case "$1" in
 	def_dir=$PWD
 	fi
 	time=$2
-	awk -v dir="$def_dir" -v time="$time" 'BEGIN{-F "\t"} $1 ~ dir {if(time<=$3) {n=split($1,a,"/"); print a[n]}}' "$WEDI_RC"	
+	if [[ $time =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+	awk -v dir="$def_dir" -v time="$time" 'BEGIN{-F "\t"} $1 ~ dir {if(time<=$3) {n=split($1,a,"/"); print a[n]}}' "$WEDI_RC"
 	exit 0
+	else
+	echo "Incorrect date format."
+	exit 1
+	fi
 	;;
 
 esac
