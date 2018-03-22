@@ -13,16 +13,15 @@ function dir_exists(){
 	fi
 }
 function call_weditor(){
-	now="$(date +'%Y-%m-%d')"
+	now="$(date +'%Y-%m-%d-%H-%M-%S.%N')"
 	if grep -q "$wfile" "$WEDI_RC"; then
 	wcount="$(awk -v wfile="$wfile" 'BEGIN{-F "\t"} $1 ~ wfile {rcd=$2} END{print rcd}' "$WEDI_RC")" # find count with awk
-	echo "$wcount"
 	let "wcount++"
-	echo "$wcount"
 	sed -i "s@.*$wfile.*@$wfile\t$wcount\t$now@" "$WEDI_RC"
 	else
 	printf "%s\t1\t%s\n" "$wfile" "$now" >> $WEDI_RC
 	fi
+	echo "Calling weditor on file: $wfile"
 	cat $WEDI_RC
 	#"${EDITOR:-${VISUAL:-vi}}" "$wfile"
 	return 0
@@ -115,7 +114,8 @@ elif [[ -d $1 ]] || [[ -z $1 ]]; then #if is DIR
 		else
 		def_dir=$PWD
 		fi
-	wfile="$(awk -v dir="$def_dir" -v now="1955-05-05" 'BEGIN{-F "\t"} $1 ~ dir {if($3>now){now=$3;rcd=$1}} END{print rcd}' "$WEDI_RC")"
+	echo "bod2"
+	wfile="$(awk -v dir="$def_dir" -v now="1955-05-05-05-05-55.555555555" 'BEGIN{-F "\t"} $1 ~ dir {if($3>now){now=$3;rcd=$1}} END{print rcd}' "$WEDI_RC")"
 	call_weditor "$wfile"
 
 else
