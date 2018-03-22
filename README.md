@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 POSIXLY_CORRECT=yes
+#command -v realpath >/dev/null 2>&1 || (echo >&2 "Realpath utility not available.";exit 1)
 
-##rozjet: sed,- if file not exists from start, if file is in WEDI_RC but not exists -> delete. chyby z editoru predavat
+##rozjet: if file is in WEDI_RC but not exists -> delete. chyby z editoru predavat. pocitat u most i s casem r! cleaner pri kazdem spusteni se zavola na zacatku a vycisti WEDI_RC od sracek
 
 #check if dir is set as argument and if exists
 function dir_exists(){
@@ -14,14 +15,18 @@ function dir_exists(){
 function call_weditor(){
 	now="$(date +'%Y-%m-%d')"
 	if grep -q "$wfile" "$WEDI_RC"; then
-	#####->SED EDIT LINE
-	:
+	wcount="$(awk -v dir="$def_dir" 'BEGIN{-F "\t"} $1 ~ dir {rcd=$2} END{print rcd}' "$WEDI_RC")" # find count with awk
+	let "wcount++"
+	sed -i "s/.*$wfile.*/$wfile\t$wcount\t$now/"
 	else
 	printf "%s\t1\t%s\n" "$wfile" "$now" >> $WEDI_RC
 	fi
 	"${EDITOR:-${VISUAL:-vi}}" "$wfile"
 	return 0
 }
+#function cleaner(){
+#	
+#}
 
 if [[ -z $WEDI_RC ]]; then #is not set, then error
 echo "WEDI_RC not set."
