@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 POSIXLY_CORRECT=yes
-#command -v realpath >/dev/null 2>&1 || (echo >&2 "Realpath utility not available.";exit 1)
 
-##rozjet: if file is in WEDI_RC but not exists -> delete. chyby z editoru predavat. pocitat u most i s casem r! cleaner pri kazdem spusteni se zavola na zacatku a vycisti WEDI_RC od sracek
+command -v realpath >/dev/null 2>&1 || { echo >&2 "Realpath not available.";exit 1; }
+
+##rozjet: chyby z editoru predavat. cleaner pri kazdem spusteni se zavola na zacatku a vycisti WEDI_RC od sracek
 
 #check if dir is set as argument and if exists
 function dir_exists(){
@@ -22,13 +23,14 @@ function call_weditor(){
 	printf "%s\t1\t%s\n" "$wfile" "$now" >> $WEDI_RC
 	fi
 	echo "Calling weditor on file: $wfile"
-	cat $WEDI_RC
 	#"${EDITOR:-${VISUAL:-vi}}" "$wfile"
 	return 0
 }
-#function cleaner(){
-#	
-#}
+function cleaner(){ # if file is in wedi but not exists, delete. Run on start everytime open file, test it in awk 
+:
+}
+
+#cleaner
 
 if [[ -z $WEDI_RC ]]; then #is not set, then error
 echo "WEDI_RC not set."
@@ -96,28 +98,21 @@ case "$1" in
 	fi
 	;;
 
-esac
+esac	
 
+elif [[ -d $1 ]] || [[ -z $1 ]]; then #looking for last edited file
+		if [[ -d $1 ]]; then #is dir
+		dir=$1
+		else #is without argument 
+		dir=$PWD
+		fi
+	wfile="$(awk -v dir="$dir" -v now="1955-05-05-05-05-55.555555555" 'BEGIN{-F "\t"} $1 ~ dir {if($3>now){now=$3;rcd=$1}} END{print rcd}' "$WEDI_RC")"
+	call_weditor "$wfile"
 
 elif [[ -f $(realpath $1) ]]; then #if is file
 	wfile="$(realpath "$1")"
-	call_weditor "$wfile"	
-
-elif [[ -d $1 ]] || [[ -z $1 ]]; then #if is DIR	
-		if [[ -d $1 ]]; then
-		dr=$1
-		else
-		dr=$PWD
-		fi	
-		if [[ $(dir_exists "$dr") -eq 0 ]]; then
-		def_dir=$(realpath "$dr")
-		else
-		def_dir=$PWD
-		fi
-	echo "bod2"
-	wfile="$(awk -v dir="$def_dir" -v now="1955-05-05-05-05-55.555555555" 'BEGIN{-F "\t"} $1 ~ dir {if($3>now){now=$3;rcd=$1}} END{print rcd}' "$WEDI_RC")"
 	call_weditor "$wfile"
-
+	
 else
 	echo "Not a file."
 	exit 1
