@@ -15,13 +15,16 @@ function dir_exists(){
 function call_weditor(){
 	now="$(date +'%Y-%m-%d')"
 	if grep -q "$wfile" "$WEDI_RC"; then
-	wcount="$(awk -v dir="$def_dir" 'BEGIN{-F "\t"} $1 ~ dir {rcd=$2} END{print rcd}' "$WEDI_RC")" # find count with awk
+	wcount="$(awk -v wfile="$wfile" 'BEGIN{-F "\t"} $1 ~ wfile {rcd=$2} END{print rcd}' "$WEDI_RC")" # find count with awk
+	echo "$wcount"
 	let "wcount++"
-	sed -i "s/.*$wfile.*/$wfile\t$wcount\t$now/"
+	echo "$wcount"
+	sed -i "s@.*$wfile.*@$wfile\t$wcount\t$now@" "$WEDI_RC"
 	else
 	printf "%s\t1\t%s\n" "$wfile" "$now" >> $WEDI_RC
 	fi
-	"${EDITOR:-${VISUAL:-vi}}" "$wfile"
+	cat $WEDI_RC
+	#"${EDITOR:-${VISUAL:-vi}}" "$wfile"
 	return 0
 }
 #function cleaner(){
