@@ -18,8 +18,7 @@ function call_weditor(){
 	else
 	printf "%s\t1\t%s\n" "$wfile" "$now" >> $WEDI_RC
 	fi
-	echo "Calling weditor on file: $wfile"
-	#"${EDITOR:-${VISUAL:-vi}}" "$wfile"
+	"${EDITOR:-${VISUAL:-vi}}" "$wfile"
 	return 0
 }
 function cleaner(){
