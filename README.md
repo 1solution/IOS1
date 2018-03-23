@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 POSIXLY_CORRECT=yes
 
+# pokud existuje pres gre
+
 command -v realpath >/dev/null 2>&1 || { echo >&2 "Realpath not available.";exit 1; }
 
 ##rozjet: chyby z editoru predavat. cleaner pri kazdem spusteni se zavola na zacatku a vycisti WEDI_RC od sracek
@@ -26,11 +28,16 @@ function call_weditor(){
 	#"${EDITOR:-${VISUAL:-vi}}" "$wfile"
 	return 0
 }
-function cleaner(){ # if file is in wedi but not exists, delete. Run on start everytime open file, test it in awk 
-:
-}
 
-#cleaner
+function cleaner(){
+while IFS= read line || [ -n "$line" ]
+do
+ prom="$(awk -v line="$line" '$0 ~ line {print $1}' "$WEDI_RC")"
+ if [[ ! -f $prom ]]; then
+ sed -i "\:$prom:d" $WEDI_RC
+ fi
+done < "$WEDI_RC"
+}
 
 if [[ -z $WEDI_RC ]]; then #is not set, then error
 echo "WEDI_RC not set."
@@ -38,6 +45,8 @@ exit 1
 elif [[ ! -f $WEDI_RC ]]; then #test if file not exists (but is set), then create path+file 
 mkdir -p "$(dirname "$WEDI_RC")" && touch "$WEDI_RC"
 fi
+
+cleaner
 
 if [[ $1 == -b || $1 == -l || $1 == -a || $1 == -m ]]; then
 
