@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 POSIXLY_CORRECT=yes
-
-# pokud existuje pres gre
-
 command -v realpath >/dev/null 2>&1 || { echo >&2 "Realpath not available.";exit 1; }
-
-##rozjet: chyby z editoru predavat. cleaner pri kazdem spusteni se zavola na zacatku a vycisti WEDI_RC od sracek
-
 #check if dir is set as argument and if exists
 function dir_exists(){
 	if [[ -n $dr ]] && [[ -d $dr ]]; then
@@ -28,7 +22,6 @@ function call_weditor(){
 	#"${EDITOR:-${VISUAL:-vi}}" "$wfile"
 	return 0
 }
-
 function cleaner(){
 while IFS= read line || [ -n "$line" ]
 do
@@ -49,7 +42,6 @@ fi
 cleaner
 
 if [[ $1 == -b || $1 == -l || $1 == -a || $1 == -m ]]; then
-
 case "$1" in
 	-m)
 	dr=$2
@@ -106,7 +98,6 @@ case "$1" in
 	exit 1
 	fi
 	;;
-
 esac	
 
 elif [[ -d $1 ]] || [[ -z $1 ]]; then #looking for last edited file
@@ -117,11 +108,9 @@ elif [[ -d $1 ]] || [[ -z $1 ]]; then #looking for last edited file
 		fi
 	wfile="$(awk -v dir="$dir" -v now="1955-05-05-05-05-55.555555555" 'BEGIN{-F "\t"} $1 ~ dir {if($3>now){now=$3;rcd=$1}} END{print rcd}' "$WEDI_RC")"
 	call_weditor "$wfile"
-
 elif [[ -f $(realpath $1) ]]; then #if is file
 	wfile="$(realpath "$1")"
-	call_weditor "$wfile"
-	
+	call_weditor "$wfile"	
 else
 	echo "Not a file."
 	exit 1
