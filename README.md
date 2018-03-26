@@ -19,7 +19,8 @@ function call_weditor(){
 	printf "%s\t1\t%s\n" "$wfile" "$now" >> $WEDI_RC
 	fi
 	"${EDITOR:-${VISUAL:-vi}}" "$wfile"
-	return 0
+	ex="$?"
+	return $ex
 }
 function cleaner(){
 while IFS= read line || [ -n "$line" ]
